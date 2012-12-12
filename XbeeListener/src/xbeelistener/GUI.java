@@ -1,0 +1,539 @@
+package xbeelistener;
+
+import gnu.io.CommPortIdentifier;
+import java.awt.BorderLayout;
+import java.awt.Color;
+import java.awt.Container;
+import java.awt.Dimension;
+import java.awt.Toolkit;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.KeyEvent;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
+import java.io.File;
+import java.net.InetAddress;
+import java.net.UnknownHostException;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.Enumeration;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import javax.swing.BoxLayout;
+import javax.swing.ButtonGroup;
+import javax.swing.ImageIcon;
+import javax.swing.JButton;
+import javax.swing.JComboBox;
+import javax.swing.JFileChooser;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JMenu;
+import javax.swing.JMenuBar;
+import javax.swing.JMenuItem;
+import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+import javax.swing.JPopupMenu;
+import javax.swing.JRadioButtonMenuItem;
+import javax.swing.JScrollPane;
+import javax.swing.JTextArea;
+import javax.swing.JTextField;
+import javax.swing.JToolBar;
+import javax.swing.KeyStroke;
+import javax.swing.SwingUtilities;
+import javax.swing.UIManager;
+import javax.swing.UnsupportedLookAndFeelException;
+import javax.swing.border.EtchedBorder;
+import javax.swing.text.SimpleAttributeSet;
+import javax.swing.text.StyleConstants;
+import javax.swing.text.StyledDocument;
+
+/**
+ *
+ * @author aviggiano <aviggiano@centrale-marseille.fr>
+ * @version 1.0
+ * @since 2012-07-01
+ */
+
+public class GUI extends JFrame implements ActionListener, MouseListener{
+    
+    CommunicationPort communicationPort;
+    protected static FileWriterReader rw;    
+    
+    private static DateFormat dateFormat;
+    private static Date date;    
+    private InetAddress addr;
+    private byte[] ipAddr;
+    private String hostname;    
+    
+    public static final int MSG = 0;
+    public static final int INFO = 1;
+    public static final int ERROR = 2;
+    
+    private String[] lookAndFeel = {"Windows", "Nimbus", "Motif", "Ocean"}; // look and feel "Windows". essayez "Nimbus", "Steel", "Ocean", etc.private SplitPaneAI splitPaneAI;
+    private JFileChooser fileChooser;
+    //private FileFilterIA fileFilter; 
+    
+    private double resWidth = 5;
+    private double resHeight = 3;
+    
+    private JMenuItem MIAbout;
+    
+    private JMenuBar barreDeMenus;
+  
+    private JMenu menuHelp;
+    
+    private JPopupMenu popUpMenu;
+    private boolean enable = true;
+    protected JTextArea textArea;
+    protected JScrollPane scrollPane;
+    protected Toolkit toolkit = Toolkit.getDefaultToolkit();
+    protected Dimension screenSize = toolkit.getScreenSize(); //new Dimension(400,500); 
+    protected Dimension frameSize;
+    private JToolBar toolBar;
+    
+    private JMenu menuFile;
+    private JMenuItem MISave;
+    private JMenuItem MISaveAs;
+    private JMenuItem MIClose;    
+    
+    private JMenu menuEdit;
+    
+    private JMenu menuLAF;
+    private JRadioButtonMenuItem MIWindowsLAF;
+    private JRadioButtonMenuItem MINimbusLAF;
+    private JRadioButtonMenuItem MIMetalLAF;
+    private ButtonGroup buttonGroupLAF;
+    
+    private JMenu menuAbout;
+    
+    static protected JComboBox comboBoxCOMPort;
+    static protected JTextField textFieldBaudRate;
+    
+    static protected JButton buttonConnect;
+    static protected JButton buttonDisconnect;
+    private MainPane mainPane;
+    private boolean savedForTheFirstTime = true;
+    private String savedAsFileName = "";
+    
+    
+    public GUI() {
+        //demarre la COM Port
+        demarrer(); 
+        //set title, size and location
+        setTitleSizeAndLocation();       
+        //set look and feel
+        setLookAndFeel(lookAndFeel[0]);        
+        //prend le container du JFrame
+        Container container = this.getContentPane();        
+       
+        //on cree les differentes parties du conteneur
+            //partie NORTH
+        creePartieNORTH();
+            //partie CENTER
+        creePartieCENTER();
+
+        //met tout ca dans le conteneur avec un BorderLayout
+        metToutCaDansLeConteneurAvecUnBorderLayout(container);        
+        
+        //show
+        this.setVisible(true);
+    }
+
+    @Override
+    public void actionPerformed(ActionEvent ae) {
+        String command = ae.getActionCommand();
+        Object source = ae.getSource();
+        
+
+        if (source.equals(MIWindowsLAF)) {
+            setLookAndFeel(lookAndFeel[0]);
+            SwingUtilities.updateComponentTreeUI(this); 
+        }
+        
+        if (source.equals(MIClose)){
+            System.exit(0);            
+        }
+        
+        if (source.equals(MISave)){
+            saveData();
+        }
+        
+        if (source.equals(MISaveAs)){
+            saveDataAs();
+        }
+        
+        if (source.equals(MIAbout)){
+            about();
+        }        
+
+        if (command.equals("Nimbus Look & Feel")){
+            setLookAndFeel(lookAndFeel[1]);
+            SwingUtilities.updateComponentTreeUI(this); 
+        }
+
+        if (command.equals("Metal Look & Feel")){
+            setLookAndFeel("Metal");
+            SwingUtilities.updateComponentTreeUI(this);
+        }
+                
+        if (source.equals(buttonConnect)) {
+            
+            communicationPort = new CommunicationPort(comboBoxCOMPort.getSelectedItem().toString(), Integer.parseInt(textFieldBaudRate.getText()));
+            
+            try {
+                communicationPort.connect(comboBoxCOMPort.getSelectedItem().toString());
+            }
+            catch (Exception e){
+                e.printStackTrace();
+            }
+        }
+        
+        if (source.equals(buttonDisconnect)){
+            communicationPort.closePort();
+        }
+                
+                
+    }
+
+    @Override
+    public void mouseClicked(MouseEvent me) {
+        throw new UnsupportedOperationException("Not supported yet.");
+    }
+
+    @Override
+    public void mousePressed(MouseEvent me) {
+        throw new UnsupportedOperationException("Not supported yet.");
+    }
+
+    @Override
+    public void mouseReleased(MouseEvent me) {
+        throw new UnsupportedOperationException("Not supported yet.");
+    }
+
+    @Override
+    public void mouseEntered(MouseEvent me) {
+        throw new UnsupportedOperationException("Not supported yet.");
+    }
+
+    @Override
+    public void mouseExited(MouseEvent me) {
+        throw new UnsupportedOperationException("Not supported yet.");
+    }
+
+    private void demarrer() {
+         communicationPort = new CommunicationPort();
+         setHostValues();
+         setFileWriterReader();
+    }
+
+    private void setTitleSizeAndLocation() {
+        setTitle("Xbee Listener");
+        frameSize = new Dimension ((int)(screenSize.width/resWidth), (int)(screenSize.height/resHeight));
+        
+        setSize(frameSize); 
+        setLocation((int)((screenSize.width - frameSize.width)/2), (int)((screenSize.height - frameSize.height)/2)); // localisation standard
+        
+        // exit on close
+        addWindowListener(new WindowAdapter() {
+            @Override
+            public void windowClosing(WindowEvent e) {
+                System.exit(0);
+            }
+        });        
+    }
+
+    private void setLookAndFeel(String string) {
+                try {
+            for (UIManager.LookAndFeelInfo info : UIManager.getInstalledLookAndFeels()) {
+                if (string.equals(info.getName())) {
+                    UIManager.setLookAndFeel(info.getClassName());
+                    break;
+                }
+            }
+        } catch (Exception e) {
+            //mainPane.append(e.toString());
+            try {
+                UIManager.setLookAndFeel(UIManager.getCrossPlatformLookAndFeelClassName());
+            } catch (ClassNotFoundException ex) {
+                Logger.getLogger(GUI.class.getName()).log(Level.SEVERE, null, ex);
+            } catch (InstantiationException ex) {
+                Logger.getLogger(GUI.class.getName()).log(Level.SEVERE, null, ex);
+            } catch (IllegalAccessException ex) {
+                Logger.getLogger(GUI.class.getName()).log(Level.SEVERE, null, ex);
+            } catch (UnsupportedLookAndFeelException ex) {
+                Logger.getLogger(GUI.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        }
+    }
+
+    private void creePartieNORTH() {
+        //cree le menu avec les icones
+        creeMenuAvecIcones();
+        //cree les boutons avec icones
+        creeBoutonsAvecIcones();
+        //cree les combo box
+        creeLesComboBox();
+        //met les menus dans leur place
+        metLesMenusDansLeurPlace();
+        //met les listeners pour les boutons et les menus
+        metLesListenersPourLesBoutonsEtLesMenus();
+        //met une barre d'outils
+        //metUneBarreDOutils();        
+    }
+
+    private void creePartieCENTER() {
+        //cree le pane ou toutes les actions auront lieu
+        creeLePaneOuToutesLesActionsAurontLieu();
+    }
+
+    private void creeMenuAvecIcones() {
+        //on doit mettre a chaque fois getClass().getRessource(URL) pour construire le JAR
+        //si on ne met que ImageIcon(URL) ca ne marche pas
+        MISave = new JMenuItem("Enregistrer", new ImageIcon(this.getClass().getResource("images/save16.gif")));
+        MISave.setToolTipText("Enregistre les bases de donnees");
+        MISave.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_S, KeyEvent.CTRL_MASK));
+        MISaveAs = new JMenuItem("Enregistrer sous...", new ImageIcon(this.getClass().getResource("images/saveAs16.gif")));
+        MISaveAs.setToolTipText("Enregistre les bases de donnees avec un nom quelconque");
+
+        MIAbout = new JMenuItem("About",new ImageIcon(this.getClass().getResource("images/help16.png")));
+        MIClose = new JMenuItem("Fermer");        
+     
+        //pour le LookAndFeel
+        MIWindowsLAF = new JRadioButtonMenuItem("Windows Look & Feel");
+            MIWindowsLAF.setSelected(true); //cette methode peut etre ameilleure (si on initialize le lookAndFeel comme qqch d'autre que le [0], ca va cocher toujours le Windows LAF
+        MINimbusLAF = new JRadioButtonMenuItem("Nimbus Look & Feel");
+        MIMetalLAF = new JRadioButtonMenuItem("Metal Look & Feel");
+            //on les met dans un ButtonGroup (on ne peut choisir qu'un LAF a la fois)
+            buttonGroupLAF = new ButtonGroup();
+            buttonGroupLAF.add(MIWindowsLAF);
+            buttonGroupLAF.add(MINimbusLAF);
+            buttonGroupLAF.add(MIMetalLAF);    
+            
+       creeLesMenus();
+    }
+
+    private void creeLesMenus() {
+        //menus
+        barreDeMenus = new JMenuBar();
+        menuFile = new JMenu("Fichier");
+        
+        menuLAF = new JMenu ("Look & Feel");
+        menuHelp = new JMenu("Help");        
+    }
+
+    private void creeBoutonsAvecIcones() {
+        buttonConnect = new JButton("Connect");
+        buttonDisconnect = new JButton("Disconnect");
+    }
+
+    private void metLesMenusDansLeurPlace() {
+         //menu File
+        menuFile.add(MISave);
+        menuFile.add(MISaveAs);
+//        menuFile.add(MIOpen);
+        menuFile.add(MIClose);  
+        
+//        //menu Edit
+//        menuEdit.add(MIImport);
+//        menuEdit.add(MIDelete);
+//        menuEdit.add(new JSeparator());
+//        menuEdit.add(MIFind);   
+        
+        //menu Look And Feel
+        menuLAF.add(MIWindowsLAF);
+        menuLAF.add(MINimbusLAF);
+        menuLAF.add(MIMetalLAF);           
+        
+        //menu Help
+        menuHelp.add(MIAbout);      
+        
+        //barre de menus
+        barreDeMenus.add(menuFile);
+//        barreDeMenus.add(menuEdit);
+        barreDeMenus.add(menuLAF);
+        barreDeMenus.add(menuHelp);
+        setJMenuBar(barreDeMenus);        
+    }
+
+    private void metLesListenersPourLesBoutonsEtLesMenus() {
+        // les menu itens
+        MISave.addActionListener(this);
+        MISaveAs.addActionListener(this);
+//        MIOpen.addActionListener(this);
+        MIClose.addActionListener(this);
+        MIAbout.addActionListener(this);
+
+//        MIImport.addActionListener(this);
+//        MIDelete.addActionListener(this);
+//        MINew.addActionListener(this);
+//        MIFind.addActionListener(this);
+        
+        MIWindowsLAF.addActionListener(this);
+        MINimbusLAF.addActionListener(this);
+        MIMetalLAF.addActionListener(this);
+        // les boutons
+        buttonConnect.addActionListener(this);
+        buttonDisconnect.addActionListener(this);
+        // set enabled pour les menus
+        MISave.setEnabled(enable);
+        MISaveAs.setEnabled(enable);
+        
+
+//        boutonSaveBDF.addActionListener(this);
+//        boutonCancelBDF.addActionListener(this);        
+    }
+
+    private void metUneBarreDOutils() {
+        //met un toolbar
+        toolBar = new JToolBar("Toolbar", JToolBar.HORIZONTAL);
+        toolBar.setRollover(enable); // le lookAndFeel peut ne pas respecter cette methode
+        // Les boutons "Recherche Rapide" et "Recherche Avancee" vont etre implementes apres
+        //toolBar.add(boutonRechercheRapide);
+        //toolBar.add(boutonRechercheAvancee);
+        
+        toolBar.setFloatable(false); //l'utilisateur ne peut pas deplacer le ToolBar
+        toolBar.setBorder(new EtchedBorder());        
+    }
+
+    private void creeLePaneOuToutesLesActionsAurontLieu() {
+        mainPane = new MainPane();
+    }
+
+    private void metToutCaDansLeConteneurAvecUnBorderLayout(Container container) {
+        container.add(mainPane, BorderLayout.CENTER);        
+    }
+
+    private void creeLesComboBox() {
+        comboBoxCOMPort = cb1();
+        
+        textFieldBaudRate = new JTextField ("9800");
+        textFieldBaudRate.setColumns(8);
+    }
+
+    private JComboBox cb1() {
+        ArrayList<String> ports = new ArrayList<String>();
+
+
+
+        Enumeration portList = CommPortIdentifier.getPortIdentifiers();
+
+        while (portList.hasMoreElements()) {
+            CommPortIdentifier portId = (CommPortIdentifier) portList.nextElement();
+            if (portId.getPortType() == CommPortIdentifier.PORT_SERIAL) {
+                ports.add(portId.getName());
+            }
+        }
+
+        return new JComboBox(ports.toArray((new String[ports.size()])));
+    }
+
+    public static void append (String text){	
+        append(text, MSG); 
+    }    
+    
+    public static void append(String text, int messageType) {
+        StyledDocument doc = MainPane.textPane.getStyledDocument();
+
+        Color color;
+        
+        if (messageType == ERROR) color = Color.RED;
+        else if (messageType == INFO) color = Color.BLUE;
+        else if (messageType == MSG) color = Color.BLACK;
+        else color = Color.BLACK;
+        
+        //  Define a keyword attribute
+
+        SimpleAttributeSet keyWord = new SimpleAttributeSet();
+        StyleConstants.setForeground(keyWord, color);
+        //StyleConstants.setBold(keyWord, true);
+
+        //  Add some text
+
+        try{
+            doc.insertString(0, text, null );
+            doc.insertString(doc.getLength(), text, keyWord );
+        }
+        catch(Exception e) { System.out.println(e); }
+    }        
+
+    private void saveData() {
+        String filename = (!savedAsFileName.equals("")) ? savedAsFileName : (hostname + "_donnees");
+        
+        if (savedForTheFirstTime) {
+             rw  = new FileWriterReader(filename, rw.WRITE, dateFormat.format(date) + " @ " + hostname + "\n");
+             savedForTheFirstTime = false;
+        }
+        else rw = new FileWriterReader(filename, rw.WRITE, "");
+        
+        GUI.append("\nDonnees enregistrees avec succès dans le fichier ''" + filename + rw.EXTENSION + "''.", INFO);
+    }
+    
+    private void saveDataAs() {
+        fileChooser = new JFileChooser(".");
+        fileChooser.setSelectedFile(new File("donnees"));
+            try{
+                int returnValue = fileChooser.showSaveDialog(this);
+
+                if (returnValue == JFileChooser.APPROVE_OPTION) {
+                    
+                    File file = fileChooser.getSelectedFile();
+                    savedAsFileName = file.getName();
+                    
+                    rw  = new FileWriterReader(savedAsFileName, rw.WRITE, dateFormat.format(date) + " @ " + hostname + "\n");                 
+
+                    this.append("\nDonnees enregistrees avec succès dans le fichier ''" + savedAsFileName + rw.EXTENSION + "''.", INFO);
+                }
+                else {
+                    this.append("\nEnregistrement annulé."); 
+                }                            
+            }
+            catch (Exception e){
+                System.out.println(e);
+            }    
+        
+    }
+    
+    private void setHostValues(){
+        
+        dateFormat = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
+        date = new Date();
+                  
+        try {
+                    addr = InetAddress.getLocalHost();
+
+                    // Get IP Address
+                    ipAddr = addr.getAddress();
+
+                    // Get hostname
+                    hostname = addr.getHostName();
+                } catch (UnknownHostException e) {
+                    
+        }        
+    }
+
+    private void setFileWriterReader() {
+        String filename = hostname + "_donnees";
+        rw  = new FileWriterReader(filename, rw.WRITE, "");
+    }
+
+    private void about() {
+        JPanel pane = new JPanel();
+        JLabel presentation = new JLabel ("Programme de collecte de donnees Xbee");
+        JLabel blank = new JLabel(" ");
+        JLabel version = new JLabel("Version 1.0");
+        
+        pane.setLayout(new BoxLayout(pane, BoxLayout.Y_AXIS));
+        
+        pane.add(presentation);
+        pane.add(blank);
+        pane.add(version);
+        
+        JOptionPane.showConfirmDialog(this, pane , "Projet Transverse NEZ", JOptionPane.CLOSED_OPTION, JOptionPane.INFORMATION_MESSAGE);
+    }
+
+
+}
