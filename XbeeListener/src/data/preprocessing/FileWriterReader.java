@@ -1,4 +1,4 @@
-package xbeelistener;
+package data.preprocessing;
 
 import java.io.*;
 import java.util.ArrayList;
@@ -21,7 +21,7 @@ public class FileWriterReader
     public static final int READ = 0;
     public static final int WRITE = 1;
     
-    protected ArrayList<String> message = new ArrayList<String>();
+    protected ArrayList<String> message = new ArrayList<>();
     
     public long[] distinctHashCodes = new long[MAX_DISTINCT_HASH_CODES];
     public int distinctHashCodesLast = 0;

@@ -9,7 +9,10 @@ import java.io.OutputStream;
  
 
 import java.text.DateFormat;
+import java.util.ArrayList;
 import java.util.Date;
+
+import data.preprocessing.Preprocesser;
 
 /**
  *
@@ -18,7 +21,7 @@ import java.util.Date;
  * @since 2012-07-01
  */
 	public class CommunicationPort {       
-            //test
+            
 		private int rate; 
 		private static String COMPortNumber;
 		
@@ -143,37 +146,44 @@ import java.util.Date;
 	        public void run () {
 	            byte[] buffer = new byte[1024];
 	            int len = -1;
-                    
-                    /*
-                     *  tentar implementar esse read !!!!!!!!!!!!!!!!!!
-                     */
-                    
-//                                private void readSerial() {
-//                    try {
-//                        int availableBytes = inStream.available();
-//                        if (availableBytes > 0) {
-//                            // Read the serial port
-//                            inStream.read(readBuffer, 0, availableBytes);
-//
-//                            // Print it out
-//                            System.out.println(
-//                                    new String(readBuffer, 0, availableBytes));
-//                        }
-//                    } catch (IOException e) {
-//                    }
-//                }              
+                    Preprocesser processer = new Preprocesser ('\n');
+                    processer.addSeparator('\r');
+
 	            try {
-	                while ( !stop && ( (len = this.in.read(buffer)) > -1) ) { // !stop 
-	                    log = new String(buffer,0,len);
+	                while ( !stop && ( (len = this.in.read(buffer)) > -1) ) { 
+	                    // log
+                            log = new String(buffer,0,len);
+                            processer.add(log);
                             
-                            //System.out.println("len = " + len + " BUFFER = [" +  log + "]");
+                            
 	                    System.out.print(log);
 	                    GUI.append(log);
                             GUI.rw.write(log);
 	                }
+                        
+                        processer.process();
+                        for (int i = 0; processer.hasMessage() && i < processer.processedMessageSize(); i++) {
+                            System.out.println("=[" + processer.getProcessedMessage().get(i) + "]=");
+                        }                        
 	            }
 	            catch ( IOException e ){}
-	        }                
+	        }               
+            
+            /*
+             * ORIGINAL METHOD -- IT WORKS!
+             */
+//	            try {
+//	                while ( !stop && ( (len = this.in.read(buffer)) > -1) ) { // !stop 
+//	                    log = new String(buffer,0,len);
+//                            
+//                            //System.out.println("len = " + len + " BUFFER = [" +  log + "]");
+//	                    System.out.print(log);
+//	                    GUI.append(log);
+//                            GUI.rw.write(log);
+//	                }
+//	            }
+//	            catch ( IOException e ){}
+//	        }                
 	    
 	    }
  
