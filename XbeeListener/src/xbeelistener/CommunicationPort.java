@@ -18,7 +18,7 @@ import java.util.Date;
  * @since 2012-07-01
  */
 	public class CommunicationPort {       
-            
+            //test
 		private int rate; 
 		private static String COMPortNumber;
 		
