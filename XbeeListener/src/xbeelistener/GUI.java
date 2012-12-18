@@ -78,8 +78,8 @@ public class GUI extends JFrame implements ActionListener, MouseListener{
     private JFileChooser fileChooser;
     //private FileFilterIA fileFilter; 
     
-    private double resWidth = 5;
-    private double resHeight = 3;
+    private double resWidth = 3;
+    private double resHeight = 2;
     
     private JMenuItem MIAbout;
     
@@ -438,7 +438,9 @@ public class GUI extends JFrame implements ActionListener, MouseListener{
     
     public static void append(String text, int messageType) {
         StyledDocument doc = MainPane.textPane.getStyledDocument();
-
+        
+        StyledDocument docTest = MainPane.textPaneSorted.getStyledDocument();
+        
         Color color;
         
         if (messageType == ERROR) color = Color.RED;
@@ -457,6 +459,9 @@ public class GUI extends JFrame implements ActionListener, MouseListener{
         try{
             doc.insertString(0, text, null );
             doc.insertString(doc.getLength(), text, keyWord );
+            
+            docTest.insertString(0, text, null );
+            docTest.insertString(doc.getLength(), text, keyWord );
         }
         catch(Exception e) { System.out.println(e); }
     }        

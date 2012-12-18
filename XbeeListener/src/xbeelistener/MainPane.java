@@ -30,15 +30,17 @@ import javax.swing.text.StyledDocument;
 class MainPane extends JPanel {
 
     private JPanel panelHaut;
-    private JTextPane panelBas;
+    private JPanel panelBas;
     
     private JLabel labelCOMPort;
     private JLabel labelBaudRate;
     private JLabel labelLog;
     protected static JTextPane textPane;
+    protected static JTextPane textPaneSorted;
     private Font font;
     private JPanel splitPane; //c'est plus un JSplitPanel. 
     private DefaultCaret caret;
+    private DefaultCaret caretSorted;
     
     public MainPane()  {
         super(new GridLayout(1,0));
@@ -103,12 +105,22 @@ class MainPane extends JPanel {
         caret = (DefaultCaret)textPane.getCaret();
         caret.setUpdatePolicy(DefaultCaret.ALWAYS_UPDATE);   
         
-        panelBas = textPane;
+        caretSorted = (DefaultCaret)textPaneSorted.getCaret();
+        caretSorted.setUpdatePolicy(DefaultCaret.ALWAYS_UPDATE);
+        
+        panelBas = new JPanel();
+        panelBas.setLayout(new GridLayout(1,2));
+        panelBas.add(textPane);
+        panelBas.add(textPaneSorted);
     }
 
     private void creeLaZoneDeTexte() {
         textPane = new JTextPane();
         textPane.setSize( textPane.getPreferredSize() );
+        
+        textPaneSorted = new JTextPane();
+        textPaneSorted.setSize(textPaneSorted.getPreferredSize());
+        
         font = new Font("Arial", Font.PLAIN, 12);
         
     }
@@ -118,7 +130,8 @@ class MainPane extends JPanel {
           splitPane.setLayout(new GridLayout(0,1));
           splitPane.add(panelHaut, BorderLayout.CENTER);
           splitPane.add(panelBas, BorderLayout.SOUTH);
-          splitPane.add(new JScrollPane(panelBas));
+          panelBas.add(new JScrollPane(textPane));
+          panelBas.add(new JScrollPane(textPaneSorted));
     }
     
     
