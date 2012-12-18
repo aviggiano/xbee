@@ -5,6 +5,7 @@
 package data.preprocessing;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -13,10 +14,10 @@ import java.util.logging.Logger;
  * @author aviggiano
  */
 public class Preprocesser {
-    public ArrayList<String> processedMessage;
-    public ArrayList<String> rawMessage;
-    public ArrayList<Character> separators;
-    public String message;
+    private ArrayList<String> processedMessage;
+    private ArrayList<String> rawMessage;
+    private ArrayList<Character> separators;
+    private String message;
     
     
     public Preprocesser (char separator) {
@@ -51,6 +52,13 @@ public class Preprocesser {
             
         }
         
+    }
+    
+    public void filterDuplicates() {
+        HashSet hashSet = new HashSet();
+        hashSet.addAll(processedMessage);
+        processedMessage.clear();
+        processedMessage.addAll(hashSet);
     }
     
     public ArrayList<String> getProcessedMessage() {

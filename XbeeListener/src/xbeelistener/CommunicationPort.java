@@ -38,7 +38,7 @@ import data.preprocessing.Preprocesser;
 		private CommPort commPort;
 
 		
-		public static boolean stop = false;
+		private static boolean stop = false;
 
 	    public CommunicationPort(){
 	        super();
@@ -53,23 +53,23 @@ import data.preprocessing.Preprocesser;
 	    void connect ( String portName ) throws Exception{
 	    	stop = false;
 	    	
-	    	GUI.append("Getting port identifiers...\n", GUI.INFO);
+	    	GUI.append("Getting port identifiers...\n", GUI.INFO, GUI.LEFT_PANE );
 	        commPortID = CommPortIdentifier.getPortIdentifier(portName);
-	        GUI.append("Succes.\n", GUI.INFO);
+	        GUI.append("Succes.\n", GUI.INFO, GUI.LEFT_PANE);
 	        
 	        if ( commPortID.isCurrentlyOwned() ){
                     String message2 = "Error: Port is currently in use. Please try again.\n";
 	            System.out.println(message2);
-	            GUI.append(message2, GUI.ERROR);
+	            GUI.append(message2, GUI.ERROR, GUI.LEFT_PANE);
 	        }
 	        else{
                     String message = "Connecting to port...\n\n";
 	            System.out.println(message);
-	            GUI.append(message, GUI.INFO);
+	            GUI.append(message, GUI.INFO, GUI.LEFT_PANE);
 	            commPort = commPortID.open(this.getClass().getName(),2000);
 	            if ( commPort instanceof SerialPort )
 	            {
-	            	GUI.append("Starting serial reader and writer...\n", GUI.INFO);
+	            	GUI.append("Starting serial reader and writer...\n", GUI.INFO, GUI.LEFT_PANE);
 	            	//si le port est present mais pas connecte
 	                SerialPort serialPort = (SerialPort) commPort;
 	                serialPort.setSerialPortParams(rate,SerialPort.DATABITS_8,SerialPort.STOPBITS_1,SerialPort.PARITY_NONE);
@@ -84,7 +84,7 @@ import data.preprocessing.Preprocesser;
                     else { // si le port n'est pas present
 	            	String message1 = "Error: Only serial ports are handled by this example.\n";
 	                System.out.println(message1);
-	                GUI.append(message1, GUI.ERROR);
+	                GUI.append(message1, GUI.ERROR, GUI.LEFT_PANE);
 	            }
 	        }   
 	    }
@@ -92,7 +92,7 @@ import data.preprocessing.Preprocesser;
 	    public void disconnect() {
 	    	String message = "Closing port : " + commPortID.getName() + "\n";
 	    	System.out.println(message);
-	    	GUI.append(message, GUI.INFO);
+	    	GUI.append(message, GUI.INFO,GUI.LEFT_PANE);
 
 	    	try {
                     commPort.getInputStream().close();
@@ -125,11 +125,11 @@ import data.preprocessing.Preprocesser;
 
 			    	String message = "\nClosing port...\n\n";
 			    	System.out.println(message);
-			    	GUI.append(message, GUI.INFO);			
+			    	GUI.append(message, GUI.INFO, GUI.LEFT_PANE);			
                         }
 		    }
 		    catch (Exception e) {
-                        GUI.append(e.getMessage(), GUI.ERROR);
+                        GUI.append(e.getMessage(), GUI.ERROR, GUI.LEFT_PANE);
                     }
 		    
 	    }	    
@@ -148,7 +148,8 @@ import data.preprocessing.Preprocesser;
 	            int len = -1;
                     Preprocesser processer = new Preprocesser ('\n');
                     processer.addSeparator('\r');
-
+                    int count = 0;
+                    
 	            try {
 	                while ( !stop && ( (len = this.in.read(buffer)) > -1) ) { 
 	                    // log
@@ -157,14 +158,25 @@ import data.preprocessing.Preprocesser;
                             
                             
 	                    System.out.print(log);
-	                    GUI.append(log);
+	                    GUI.append(log, GUI.MSG, GUI.LEFT_PANE);
                             GUI.rw.write(log);
-	                }
+                            
+                            count++;
+                            if (count == 50) {
+                                processer.process();
+                                processer.filterDuplicates();    
                         
-                        processer.process();
-                        for (int i = 0; processer.hasMessage() && i < processer.processedMessageSize(); i++) {
-                            System.out.println("=[" + processer.getProcessedMessage().get(i) + "]=");
-                        }                        
+                                for (int i = 0; processer.hasMessage() && i < processer.processedMessageSize(); i++) {
+                                    GUI.append(processer.getProcessedMessage().get(i) + "\n", GUI.MSG, GUI.RIGHT_PANE);
+                                    System.out.println("=[" + processer.getProcessedMessage().get(i) + "]=");
+                                }
+                                
+                                count = 0;
+                            }
+                        }
+                        
+
+
 	            }
 	            catch ( IOException e ){}
 	        }               

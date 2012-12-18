@@ -74,6 +74,9 @@ public class GUI extends JFrame implements ActionListener, MouseListener{
     public static final int INFO = 1;
     public static final int ERROR = 2;
     
+    public static final int LEFT_PANE = 0;
+    public static final int RIGHT_PANE = 1;
+    
     private String[] lookAndFeel = {"Windows", "Nimbus", "Motif", "Ocean"}; // look and feel "Windows". essayez "Nimbus", "Steel", "Ocean", etc.private SplitPaneAI splitPaneAI;
     private JFileChooser fileChooser;
     //private FileFilterIA fileFilter; 
@@ -411,7 +414,7 @@ public class GUI extends JFrame implements ActionListener, MouseListener{
     private void creeLesComboBox() {
         comboBoxCOMPort = cb1();
         
-        textFieldBaudRate = new JTextField ("9800");
+        textFieldBaudRate = new JTextField ("9600");
         textFieldBaudRate.setColumns(8);
     }
 
@@ -432,14 +435,17 @@ public class GUI extends JFrame implements ActionListener, MouseListener{
         return new JComboBox(ports.toArray((new String[ports.size()])));
     }
 
-    public static void append (String text){	
-        append(text, MSG); 
+    public static void append (String text, int pane){	
+        append(text, MSG, pane); 
     }    
     
-    public static void append(String text, int messageType) {
-        StyledDocument doc = MainPane.textPane.getStyledDocument();
-        
-        StyledDocument docTest = MainPane.textPaneSorted.getStyledDocument();
+    public static void append(String text, int messageType, int pane) {
+        StyledDocument doc;
+
+        if (pane == RIGHT_PANE)
+            doc = MainPane.textPaneSorted.getStyledDocument();
+        else
+            doc = MainPane.textPane.getStyledDocument();
         
         Color color;
         
@@ -459,9 +465,6 @@ public class GUI extends JFrame implements ActionListener, MouseListener{
         try{
             doc.insertString(0, text, null );
             doc.insertString(doc.getLength(), text, keyWord );
-            
-            docTest.insertString(0, text, null );
-            docTest.insertString(doc.getLength(), text, keyWord );
         }
         catch(Exception e) { System.out.println(e); }
     }        
@@ -475,7 +478,7 @@ public class GUI extends JFrame implements ActionListener, MouseListener{
         }
         else rw = new FileWriterReader(filename, rw.WRITE, "");
         
-        GUI.append("\nDonnees enregistrees avec succès dans le fichier ''" + filename + rw.EXTENSION + "''.", INFO);
+        GUI.append("\nDonnees enregistrees avec succès dans le fichier ''" + filename + rw.EXTENSION + "''.", INFO, LEFT_PANE);
     }
     
     private void saveDataAs() {
@@ -494,7 +497,7 @@ public class GUI extends JFrame implements ActionListener, MouseListener{
                     this.append("\nDonnees enregistrees avec succès dans le fichier ''" + savedAsFileName + rw.EXTENSION + "''.", INFO);
                 }
                 else {
-                    this.append("\nEnregistrement annulé."); 
+                    this.append("\nEnregistrement annulé.", LEFT_PANE); 
                 }                            
             }
             catch (Exception e){
