@@ -149,6 +149,7 @@ import data.preprocessing.Preprocesser;
                     Preprocesser processer = new Preprocesser ('\n');
                     processer.addSeparator('\r');
                     int count = 0;
+                    int processedMessageOldSize = 0;
                     
 	            try {
 	                while ( !stop && ( (len = this.in.read(buffer)) > -1) ) { 
@@ -166,11 +167,11 @@ import data.preprocessing.Preprocesser;
                                 processer.process();
                                 processer.filterDuplicates();    
                         
-                                for (int i = 0; processer.hasMessage() && i < processer.processedMessageSize(); i++) {
+                                for (int i = processedMessageOldSize; processer.hasMessage() && i < processer.processedMessageSize(); i++) {
                                     GUI.append(processer.getProcessedMessage().get(i) + "\n", GUI.MSG, GUI.RIGHT_PANE);
                                     System.out.println("=[" + processer.getProcessedMessage().get(i) + "]=");
                                 }
-                                
+                                processedMessageOldSize = processer.processedMessageSize();
                                 count = 0;
                             }
                         }

@@ -473,10 +473,14 @@ public class GUI extends JFrame implements ActionListener, MouseListener{
         String filename = (!savedAsFileName.equals("")) ? savedAsFileName : (hostname + "_donnees");
         
         if (savedForTheFirstTime) {
-             rw  = new FileWriterReader(filename, rw.WRITE, dateFormat.format(date) + " @ " + hostname + "\n");
+             rw  = new FileWriterReader(filename);
+             rw.write(dateFormat.format(date) + " @ " + hostname + "\n");
+             
              savedForTheFirstTime = false;
         }
-        else rw = new FileWriterReader(filename, rw.WRITE, "");
+        else {
+            rw = new FileWriterReader(filename);
+        }
         
         GUI.append("\nDonnees enregistrees avec succès dans le fichier ''" + filename + rw.EXTENSION + "''.", INFO, LEFT_PANE);
     }
@@ -492,7 +496,8 @@ public class GUI extends JFrame implements ActionListener, MouseListener{
                     File file = fileChooser.getSelectedFile();
                     savedAsFileName = file.getName();
                     
-                    rw  = new FileWriterReader(savedAsFileName, rw.WRITE, dateFormat.format(date) + " @ " + hostname + "\n");                 
+                    rw  = new FileWriterReader(savedAsFileName);
+                    rw.write(dateFormat.format(date) + " @ " + hostname + "\n");
 
                     this.append("\nDonnees enregistrees avec succès dans le fichier ''" + savedAsFileName + rw.EXTENSION + "''.", INFO);
                 }
@@ -526,7 +531,7 @@ public class GUI extends JFrame implements ActionListener, MouseListener{
 
     private void setFileWriterReader() {
         String filename = hostname + "_donnees";
-        rw  = new FileWriterReader(filename, rw.WRITE, "");
+        rw  = new FileWriterReader(filename);
     }
 
     private void about() {

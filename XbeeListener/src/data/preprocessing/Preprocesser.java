@@ -52,6 +52,8 @@ public class Preprocesser {
             
         }
         
+        rawMessage = new ArrayList<>();
+        
     }
     
     public void filterDuplicates() {
