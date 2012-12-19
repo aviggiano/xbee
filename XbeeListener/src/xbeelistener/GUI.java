@@ -42,7 +42,6 @@ import javax.swing.JRadioButtonMenuItem;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
-import javax.swing.JToolBar;
 import javax.swing.KeyStroke;
 import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
@@ -53,13 +52,15 @@ import javax.swing.text.StyleConstants;
 import javax.swing.text.StyledDocument;
 
 /**
- *
+ * The Graphic User Interface class. 
+ * 
  * @author aviggiano <aviggiano@centrale-marseille.fr>
  * @version 1.0
- * @since 2012-07-01
+ * @since 2012-07
  */
 
 public class GUI extends JFrame implements ActionListener, MouseListener{
+    // Class variables
     
     CommunicationPort communicationPort;
     protected static FileWriterReader rw;    
@@ -77,27 +78,25 @@ public class GUI extends JFrame implements ActionListener, MouseListener{
     public static final int LEFT_PANE = 0;
     public static final int RIGHT_PANE = 1;
     
-    private String[] lookAndFeel = {"Windows", "Nimbus", "Motif", "Ocean"}; // look and feel "Windows". essayez "Nimbus", "Steel", "Ocean", etc.private SplitPaneAI splitPaneAI;
+    private String[] lookAndFeel = {"Windows", "Nimbus", "Motif", "Ocean"}; // look and feel "Windows". essayez "Nimbus", "Steel", "Ocean", etc.
     private JFileChooser fileChooser;
-    //private FileFilterIA fileFilter; 
     
+    // the resolution of the window
     private double resWidth = 3;
     private double resHeight = 2;
     
     private JMenuItem MIAbout;
     
-    private JMenuBar barreDeMenus;
+    private JMenuBar menuBar;
   
     private JMenu menuHelp;
     
-    private JPopupMenu popUpMenu;
-    private boolean enable = true;
+    private JPopupMenu popUpMenu; // not used, but can be implemented in the future.
     protected JTextArea textArea;
     protected JScrollPane scrollPane;
     protected Toolkit toolkit = Toolkit.getDefaultToolkit();
-    protected Dimension screenSize = toolkit.getScreenSize(); //new Dimension(400,500); 
+    protected Dimension screenSize = toolkit.getScreenSize();
     protected Dimension frameSize;
-    private JToolBar toolBar;
     
     private JMenu menuFile;
     private JMenuItem MISave;
@@ -123,7 +122,9 @@ public class GUI extends JFrame implements ActionListener, MouseListener{
     private boolean savedForTheFirstTime = true;
     private String savedAsFileName = "";
     
-    
+    /**
+     * Constructor that does all the work, subdivided in many void methods.
+     */
     public GUI() {
         //demarre la COM Port
         demarrer(); 
@@ -149,10 +150,9 @@ public class GUI extends JFrame implements ActionListener, MouseListener{
 
     @Override
     public void actionPerformed(ActionEvent ae) {
-        String command = ae.getActionCommand();
+        String command = ae.getActionCommand(); // this should be evited, because if we change the name of the ActionCommand, the command will change as well.
         Object source = ae.getSource();
         
-
         if (source.equals(MIWindowsLAF)) {
             setLookAndFeel(lookAndFeel[0]);
             SwingUtilities.updateComponentTreeUI(this); 
@@ -185,7 +185,6 @@ public class GUI extends JFrame implements ActionListener, MouseListener{
         }
                 
         if (source.equals(buttonConnect)) {
-            
             communicationPort = new CommunicationPort(comboBoxCOMPort.getSelectedItem().toString(), Integer.parseInt(textFieldBaudRate.getText()));
             
             try {
@@ -228,20 +227,33 @@ public class GUI extends JFrame implements ActionListener, MouseListener{
         throw new UnsupportedOperationException("Not supported yet.");
     }
 
+    /**
+     * References the instance of the class CommunicationPort.
+     */
     private void demarrer() {
          communicationPort = new CommunicationPort();
          setHostValues();
          setFileWriterReader();
     }
 
+    /**
+     * Set the title, size and location of the window. 
+     * 
+     * At the version 1.0, it's title is 'Xbee Listener', the size is defined by
+     * the resolution (see Class variables), and the location is centered in the
+     * screen.
+     */
     private void setTitleSizeAndLocation() {
         setTitle("Xbee Listener");
         frameSize = new Dimension ((int)(screenSize.width/resWidth), (int)(screenSize.height/resHeight));
         
         setSize(frameSize); 
-        setLocation((int)((screenSize.width - frameSize.width)/2), (int)((screenSize.height - frameSize.height)/2)); // localisation standard
+        setLocation((int)((screenSize.width - frameSize.width)/2), (int)((screenSize.height - frameSize.height)/2));
         
-        // exit on close
+        /**
+         * Exit on close. If we want to add another behavior to the closing 
+         * action, it should be included here.
+         */
         addWindowListener(new WindowAdapter() {
             @Override
             public void windowClosing(WindowEvent e) {
@@ -250,6 +262,11 @@ public class GUI extends JFrame implements ActionListener, MouseListener{
         });        
     }
 
+    /**
+     * Sets the look and feel of the window. 
+     * 
+     * @param string the name of the look and feel.
+     */
     private void setLookAndFeel(String string) {
                 try {
             for (UIManager.LookAndFeelInfo info : UIManager.getInstalledLookAndFeels()) {
@@ -259,7 +276,6 @@ public class GUI extends JFrame implements ActionListener, MouseListener{
                 }
             }
         } catch (Exception e) {
-            //mainPane.append(e.toString());
             try {
                 UIManager.setLookAndFeel(UIManager.getCrossPlatformLookAndFeelClassName());
             } catch (ClassNotFoundException ex) {
@@ -274,6 +290,10 @@ public class GUI extends JFrame implements ActionListener, MouseListener{
         }
     }
 
+    /**
+     * Creates the NORTH part of the window, with the menu bar, the combo boxes 
+     * and the buttons.
+     */
     private void creePartieNORTH() {
         //cree le menu avec les icones
         creeMenuAvecIcones();
@@ -289,11 +309,17 @@ public class GUI extends JFrame implements ActionListener, MouseListener{
         //metUneBarreDOutils();        
     }
 
+    /**
+     * Creates the CENTER part of the window -- everything but the menu bar.
+     */
     private void creePartieCENTER() {
         //cree le pane ou toutes les actions auront lieu
         creeLePaneOuToutesLesActionsAurontLieu();
     }
 
+    /**
+     * Creates the menu items. 
+     */
     private void creeMenuAvecIcones() {
         //on doit mettre a chaque fois getClass().getRessource(URL) pour construire le JAR
         //si on ne met que ImageIcon(URL) ca ne marche pas
@@ -303,7 +329,7 @@ public class GUI extends JFrame implements ActionListener, MouseListener{
         MISaveAs = new JMenuItem("Enregistrer sous...", new ImageIcon(this.getClass().getResource("images/saveAs16.gif")));
         MISaveAs.setToolTipText("Enregistre les bases de donnees avec un nom quelconque");
 
-        MIAbout = new JMenuItem("About",new ImageIcon(this.getClass().getResource("images/help16.png")));
+        MIAbout = new JMenuItem("A propos",new ImageIcon(this.getClass().getResource("images/help16.png")));
         MIClose = new JMenuItem("Fermer");        
      
         //pour le LookAndFeel
@@ -320,25 +346,34 @@ public class GUI extends JFrame implements ActionListener, MouseListener{
        creeLesMenus();
     }
 
+    /**
+     * Creates the menus.
+     */
     private void creeLesMenus() {
         //menus
-        barreDeMenus = new JMenuBar();
+        menuBar = new JMenuBar();
         menuFile = new JMenu("Fichier");
         
         menuLAF = new JMenu ("Look & Feel");
-        menuHelp = new JMenu("Help");        
+        menuHelp = new JMenu("Aide");        
     }
 
+    /**
+     * Creates the buttons.
+     */
     private void creeBoutonsAvecIcones() {
         buttonConnect = new JButton("Connect");
         buttonDisconnect = new JButton("Disconnect");
     }
 
+    /**
+     * Inserts the menu items into their respective menus.
+     */
     private void metLesMenusDansLeurPlace() {
-         //menu File
+        //menu File
         menuFile.add(MISave);
         menuFile.add(MISaveAs);
-//        menuFile.add(MIOpen);
+        // menuFile.add(MIOpen); // not used
         menuFile.add(MIClose);  
         
 //        //menu Edit
@@ -356,13 +391,16 @@ public class GUI extends JFrame implements ActionListener, MouseListener{
         menuHelp.add(MIAbout);      
         
         //barre de menus
-        barreDeMenus.add(menuFile);
+        menuBar.add(menuFile);
 //        barreDeMenus.add(menuEdit);
-        barreDeMenus.add(menuLAF);
-        barreDeMenus.add(menuHelp);
-        setJMenuBar(barreDeMenus);        
+        menuBar.add(menuLAF);
+        menuBar.add(menuHelp);
+        setJMenuBar(menuBar);        
     }
 
+    /**
+     * Adds the ActionListeners to buttons and menus.
+     */
     private void metLesListenersPourLesBoutonsEtLesMenus() {
         // les menu itens
         MISave.addActionListener(this);
@@ -383,45 +421,45 @@ public class GUI extends JFrame implements ActionListener, MouseListener{
         buttonConnect.addActionListener(this);
         buttonDisconnect.addActionListener(this);
         // set enabled pour les menus
-        MISave.setEnabled(enable);
-        MISaveAs.setEnabled(enable);
-        
-
-//        boutonSaveBDF.addActionListener(this);
-//        boutonCancelBDF.addActionListener(this);        
+        MISave.setEnabled(true);
+        MISaveAs.setEnabled(true);   
     }
 
-    private void metUneBarreDOutils() {
-        //met un toolbar
-        toolBar = new JToolBar("Toolbar", JToolBar.HORIZONTAL);
-        toolBar.setRollover(enable); // le lookAndFeel peut ne pas respecter cette methode
-        // Les boutons "Recherche Rapide" et "Recherche Avancee" vont etre implementes apres
-        //toolBar.add(boutonRechercheRapide);
-        //toolBar.add(boutonRechercheAvancee);
-        
-        toolBar.setFloatable(false); //l'utilisateur ne peut pas deplacer le ToolBar
-        toolBar.setBorder(new EtchedBorder());        
-    }
-
+    /**
+     * Creates an instance of the MainPane.
+     * 
+     * @see MainPane.
+     */
     private void creeLePaneOuToutesLesActionsAurontLieu() {
         mainPane = new MainPane();
     }
 
+    /**
+     * Wraps the MainPane into the container and sets it to the CENTER of a BorderLayout.
+     * 
+     * @param container the container of the Frame.
+     */
     private void metToutCaDansLeConteneurAvecUnBorderLayout(Container container) {
         container.add(mainPane, BorderLayout.CENTER);        
     }
 
+    /**
+     * Creates the combo boxes.
+     */
     private void creeLesComboBox() {
         comboBoxCOMPort = cb1();
         
         textFieldBaudRate = new JTextField ("9600");
         textFieldBaudRate.setColumns(8);
     }
-
+    
+    /**
+     * Creates the combo box with the available COM Ports.
+     * 
+     * @return a combo box with the available COM Ports.
+     */
     private JComboBox cb1() {
         ArrayList<String> ports = new ArrayList<String>();
-
-
 
         Enumeration portList = CommPortIdentifier.getPortIdentifiers();
 
@@ -435,10 +473,23 @@ public class GUI extends JFrame implements ActionListener, MouseListener{
         return new JComboBox(ports.toArray((new String[ports.size()])));
     }
 
+    /**
+     * Appends a text message of type MSG into the desired text pane.
+     * 
+     * @param text the text message.
+     * @param pane the pane (right or left).
+     */
     public static void append (String text, int pane){	
         append(text, MSG, pane); 
     }    
     
+    /**
+     * Appends a text message of a specific type (MSG, INFO, ERROR, ...) into the desired text pane.
+     * 
+     * @param text the text message.
+     * @param messageType the type of the message.
+     * @param pane the pane (right or left).
+     */
     public static void append(String text, int messageType, int pane) {
         StyledDocument doc;
 
@@ -454,14 +505,11 @@ public class GUI extends JFrame implements ActionListener, MouseListener{
         else if (messageType == MSG) color = Color.BLACK;
         else color = Color.BLACK;
         
-        //  Define a keyword attribute
-
+        // Define a keyword attribute
         SimpleAttributeSet keyWord = new SimpleAttributeSet();
         StyleConstants.setForeground(keyWord, color);
-        //StyleConstants.setBold(keyWord, true);
 
-        //  Add some text
-
+        // Add the text to the pane
         try{
             doc.insertString(0, text, null );
             doc.insertString(doc.getLength(), text, keyWord );
@@ -469,11 +517,14 @@ public class GUI extends JFrame implements ActionListener, MouseListener{
         catch(Exception e) { System.out.println(e); }
     }        
 
+    /**
+     * Save the data to file.
+     */
     private void saveData() {
         String filename = (!savedAsFileName.equals("")) ? savedAsFileName : (hostname + "_donnees");
         
         if (savedForTheFirstTime) {
-             rw  = new FileWriterReader(filename);
+             rw = new FileWriterReader(filename);
              rw.write(dateFormat.format(date) + " @ " + hostname + "\n");
              
              savedForTheFirstTime = false;
@@ -485,6 +536,9 @@ public class GUI extends JFrame implements ActionListener, MouseListener{
         GUI.append("\nDonnees enregistrees avec succès dans le fichier ''" + filename + rw.EXTENSION + "''.", INFO, LEFT_PANE);
     }
     
+    /**
+     * Save the data to a file of specific name.
+     */
     private void saveDataAs() {
         fileChooser = new JFileChooser(".");
         fileChooser.setSelectedFile(new File("donnees"));
@@ -511,6 +565,9 @@ public class GUI extends JFrame implements ActionListener, MouseListener{
         
     }
     
+    /**
+     * Set host values (name and IP address).
+     */
     private void setHostValues(){
         
         dateFormat = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
@@ -529,11 +586,19 @@ public class GUI extends JFrame implements ActionListener, MouseListener{
         }        
     }
 
+    /**
+     * Sets up the FileWriterReader.
+     * 
+     * There are too many redundant methods. This should be revised/cleaned up.
+     */
     private void setFileWriterReader() {
         String filename = hostname + "_donnees";
         rw  = new FileWriterReader(filename);
     }
 
+    /**
+     * Sets up the About section.
+     */
     private void about() {
         JPanel pane = new JPanel();
         JLabel presentation = new JLabel ("Programme de collecte de donnees Xbee");
@@ -548,6 +613,4 @@ public class GUI extends JFrame implements ActionListener, MouseListener{
         
         JOptionPane.showConfirmDialog(this, pane , "Projet Transverse NEZ", JOptionPane.CLOSED_OPTION, JOptionPane.INFORMATION_MESSAGE);
     }
-
-
 }
