@@ -14,7 +14,7 @@ import java.util.ArrayList;
  * 
  * @author aviggiano <aviggiano@centrale-marseille.fr> et al.
  * @version 1.0
- * @since 2012-07-01
+ * @since 2012-07
  */
 
 public class FileWriterReader {
