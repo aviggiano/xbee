@@ -8,7 +8,7 @@ import java.util.HashSet;
  * specific rules. At the version 1.0, a message is contained in the ArrayList 
  * rawMessage, divided 'randomly' in strings of variable length. For instance, 
  * a rawMessage containing {"Hel", "lo ", "W", "or", "ld!\nI love", "you.\n"}
- * would be processed to {"Hello World!", "I love you."}, if the 'rule' is that
+ * would be processed as {"Hello World!", "I love you."}, if the 'rule' is that
  * each element should be separated by '\n'.
  * 
  * @author aviggiano
