@@ -120,4 +120,14 @@ public class Preprocesser {
     public void add(String message){
         rawMessage.add(message);
     }
+
+    /**
+     * Clears the ArrayLists of processed and raw messages. The separators are 
+     * not changed.
+     */
+    public void clear() {
+        processedMessage = new ArrayList<>();
+        rawMessage = new ArrayList<>();
+        // separators remain the same.
+    }
 }
