@@ -601,7 +601,7 @@ public class GUI extends JFrame implements ActionListener, MouseListener{
      */
     private void about() {
         JPanel pane = new JPanel();
-        JLabel presentation = new JLabel ("Programme de collecte de donnees Xbee");
+        JLabel presentation = new JLabel ("Programme de récupératin de donnees Xbee");
         JLabel blank = new JLabel(" ");
         JLabel version = new JLabel("Version 1.0");
         

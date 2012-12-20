@@ -66,6 +66,24 @@ public class CSVParser {
         }
     }
     
+    public String parseToCSV (String message){
+        String parsedMessage = "";
+        
+        if (message.length() == sizeOfMessage && message.charAt(0) == 'N'){
+            parsedMessage += message.substring(1, 2)   + ",";       // NEZ X
+            parsedMessage += message.substring(2, 6)   + "-" +      // Date YYYY-MM-DD
+                             message.substring(6, 8)   + "-" +
+                             message.substring(8, 10)  + ",";
+            parsedMessage += message.substring(10, 12) + ":" +      // Time hh:mm:ss
+                             message.substring(12, 14) + ":" +
+                             message.substring(14, 16) + ",";       
+            parsedMessage += message.substring(16, 19) + ",";       // Sensor type TTT
+            parsedMessage += message.substring(19, 23) ;            // Measure d.dd
+        }
+        
+        return parsedMessage;
+    }    
+    
     /**
      * Get a CSV format String message.
      * 
@@ -74,5 +92,13 @@ public class CSVParser {
      */
     public String get (int i) {
         return CSVParsedListOfMessages.get(i);
+    }
+
+    public boolean hasMessage() {
+        return !CSVParsedListOfMessages.isEmpty();
+    }
+    
+    public int size () {
+        return CSVParsedListOfMessages.size();
     }
 }

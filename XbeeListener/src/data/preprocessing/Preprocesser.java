@@ -130,4 +130,8 @@ public class Preprocesser {
         rawMessage = new ArrayList<>();
         // separators remain the same.
     }
+    
+    public String get (int i){
+        return processedMessage.get(i);
+    }
 }

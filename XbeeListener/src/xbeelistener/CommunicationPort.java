@@ -199,7 +199,7 @@ public class CommunicationPort {
             CSVParser csvParser = new CSVParser(messageSize());
             processer.addSeparator('\r');
             int countDoTheProcessing = 0;
-            int processedMessageOldSize = 0;
+            int processerMessageOldSize = 0;
 
             try {
                 while (!canStop && ((len = this.in.read(buffer)) > -1)) {
@@ -209,19 +209,22 @@ public class CommunicationPort {
 
                     System.out.print(log);
                     GUI.append(log, GUI.MSG, GUI.LEFT_PANE);
-                    GUI.rw.write(log);
 
                     countDoTheProcessing++;
                     if (countDoTheProcessing == 50) {
                         processer.process();
                         processer.filterDuplicates();
-                        csvParser.parseToCSV(processer.getProcessedMessage());
 
-                        for (int i = processedMessageOldSize; processer.hasMessage() && i < processer.processedMessageSize(); i++) {
-                            GUI.append(csvParser.get(i) + "\n", GUI.MSG, GUI.RIGHT_PANE);
-                            System.out.println("[" + processer.getProcessedMessage().get(i) + "]");
+                        for (int i = processerMessageOldSize; processer.hasMessage() &&
+                                                        i < processer.processedMessageSize(); i++) {
+                            String csvMessage = csvParser.parseToCSV(processer.get(i));
+                            if (csvMessage.length() != 0 ){
+                                GUI.append(csvMessage + "\n", GUI.MSG, GUI.RIGHT_PANE);
+                                GUI.rw.write(csvParser.parseToCSV(processer.get(i)) + "\n");
+                            }
+                            System.out.println("[" + csvParser.parseToCSV(processer.get(i))+ "]");
                         }
-                        processedMessageOldSize = processer.processedMessageSize();
+                        processerMessageOldSize = processer.processedMessageSize();
                         countDoTheProcessing = 0;
                     }
                     
@@ -249,7 +252,6 @@ public class CommunicationPort {
             
             int size = N+X+YYYY+MM+DD+hh+mm+ss+TTT+dpdd;
             
-            System.out.println(size);
             return size;
         }
     }
