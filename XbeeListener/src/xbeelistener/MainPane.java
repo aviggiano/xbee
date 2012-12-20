@@ -22,13 +22,20 @@ import javax.swing.text.StyleConstants;
 import javax.swing.text.StyledDocument;
 
 /**
- *
+ * This is the main pane of the Graphic User Interface.
+ * 
+ * The upper pane is composed by the combo boxes and buttons, and the bottom 
+ * pane is composed by two text panes. The left one shows the entire 
+ * transmission flow, and the right one shows only what is being written on the
+ * file (after processing the message), that is, the sorted message.
+ * 
  * @author aviggiano <aviggiano@centrale-marseille.fr>
  * @version 1.0
- * @since 2012-07-01
+ * @since 2012-07
  */
 class MainPane extends JPanel {
-
+    // Class variables
+    
     private JPanel panelHaut;
     private JPanel panelBas;
     
@@ -38,10 +45,13 @@ class MainPane extends JPanel {
     protected static JTextPane textPane;
     protected static JTextPane textPaneSorted;
     private Font font;
-    private JPanel splitPane; //c'est plus un JSplitPanel. 
+    private JPanel dividedPane;
     private DefaultCaret caret;
     private DefaultCaret caretSorted;
     
+    /**
+     * Constructor that does all the work, subdivided in many void methods.
+     */
     public MainPane()  {
         super(new GridLayout(1,0));
         
@@ -57,20 +67,25 @@ class MainPane extends JPanel {
         metLesPanelHautEtBasJSplitPaneVertical();
         
         //Add the split pane to this panel.
-        add(splitPane);   
+        add(dividedPane);   
     }
 
+    /**
+     * Creates the labels of the upper pane.
+     */
     private void creeLesLabels() {
         labelCOMPort = new JLabel ("COM Port");
         labelBaudRate = new JLabel ("Baud Rate");
         labelLog = new JLabel ("Log");
     }
 
+    /**
+     * Creates the upper pane.
+     */
     private void creeLePanelHaut() {
         panelHaut = new JPanel();
         panelHaut.setLayout (new BoxLayout (panelHaut, BoxLayout.Y_AXIS));
         
-
         
         JPanel ligne1 = new JPanel();
         JPanel ligne2 = new JPanel();
@@ -89,16 +104,21 @@ class MainPane extends JPanel {
         
         ligne2.add (GUI.buttonDisconnect);
         
+        /**
+         * This could be improved. These glues does not have a very nice 
+         * esthetics, but the were a very easy and fast solution to the problem
+         * of disposing the components in the pane.
+         */
         panelHaut.add(Box.createVerticalGlue());
         panelHaut.add(ligne1);
         panelHaut.add(Box.createVerticalGlue());
         panelHaut.add(ligne2);
         panelHaut.add(Box.createVerticalGlue());
-        
-        
-        
     }
 
+    /**
+     * Creates the bottom pane.
+     */
     private void creeLePanelBas() {
         //cree la zone de texte
         creeLaZoneDeTexte();    
@@ -114,6 +134,9 @@ class MainPane extends JPanel {
         panelBas.add(textPaneSorted);
     }
 
+    /**
+     * Creates the text panes (left and right).
+     */
     private void creeLaZoneDeTexte() {
         textPane = new JTextPane();
         textPane.setSize( textPane.getPreferredSize() );
@@ -121,18 +144,18 @@ class MainPane extends JPanel {
         textPaneSorted = new JTextPane();
         textPaneSorted.setSize(textPaneSorted.getPreferredSize());
         
-        font = new Font("Arial", Font.PLAIN, 12);
-        
+        font = new Font("Arial", Font.PLAIN, 12);        
     }
 
+    /**
+     * Wraps everything up in a divided pane.
+     */
     private void metLesPanelHautEtBasJSplitPaneVertical() {
-          splitPane = new JPanel();
-          splitPane.setLayout(new GridLayout(0,1));
-          splitPane.add(panelHaut, BorderLayout.CENTER);
-          splitPane.add(panelBas, BorderLayout.SOUTH);
+          dividedPane = new JPanel();
+          dividedPane.setLayout(new GridLayout(0,1));
+          dividedPane.add(panelHaut, BorderLayout.NORTH);
+          dividedPane.add(panelBas, BorderLayout.SOUTH);
           panelBas.add(new JScrollPane(textPane));
           panelBas.add(new JScrollPane(textPaneSorted));
     }
-    
-    
 }
