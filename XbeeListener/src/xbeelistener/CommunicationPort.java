@@ -1,5 +1,6 @@
 package xbeelistener;
 
+import data.preprocessing.CSVParser;
 import data.preprocessing.Preprocesser;
 import gnu.io.CommPort;
 import gnu.io.CommPortIdentifier;
@@ -87,12 +88,12 @@ public class CommunicationPort {
     void connect(String portName) throws Exception {
         canStop = false;
 
-        GUI.append("Getting port identifiers...\n", GUI.INFO, GUI.LEFT_PANE);
+        GUI.append("Getting port identifiers... ", GUI.INFO, GUI.LEFT_PANE);
         commPortID = CommPortIdentifier.getPortIdentifier(portName);
         GUI.append("Succes.\n", GUI.INFO, GUI.LEFT_PANE);
 
         if (commPortID.isCurrentlyOwned()) {
-            String message2 = "Error: Port is currently in use. Please try again.\n";
+            String message2 = "Error: Port is currently in use. Please try again in a moment.\n";
             System.out.println(message2);
             GUI.append(message2, GUI.ERROR, GUI.LEFT_PANE);
         } else {
@@ -169,6 +170,7 @@ public class CommunicationPort {
         // Class variables
         
         InputStream in;
+        private static final int PROCESSED_MESSAGE_LIMIT_SIZE = 100;
 
         /**
          * Initializes the InputStream.
@@ -186,16 +188,17 @@ public class CommunicationPort {
          * The processing is done by an instance of the Preprocesser class.
          * As this operation must be done regularly, a counter is introduced to 
          * tell when the processing step should occur. Other methods could be 
-         * used to trigger this functionality, but this is the easiest one.
+         * used to trigger this functionality, but this is the easiest one to 
+         * implement. Further 
          */
         @Override
         public void run() {
             byte[] buffer = new byte[1024];
             int len = -1;
             Preprocesser processer = new Preprocesser('\n');
+            CSVParser csvParser = new CSVParser(messageSize());
             processer.addSeparator('\r');
             int countDoTheProcessing = 0;
-            int countClearThePreprocessor = 0;
             int processedMessageOldSize = 0;
 
             try {
@@ -209,25 +212,45 @@ public class CommunicationPort {
                     GUI.rw.write(log);
 
                     countDoTheProcessing++;
-                    countClearThePreprocessor++;
                     if (countDoTheProcessing == 50) {
                         processer.process();
                         processer.filterDuplicates();
+                        csvParser.parseToCSV(processer.getProcessedMessage());
 
                         for (int i = processedMessageOldSize; processer.hasMessage() && i < processer.processedMessageSize(); i++) {
-                            GUI.append(processer.getProcessedMessage().get(i) + "\n", GUI.MSG, GUI.RIGHT_PANE);
+                            GUI.append(csvParser.get(i) + "\n", GUI.MSG, GUI.RIGHT_PANE);
                             System.out.println("[" + processer.getProcessedMessage().get(i) + "]");
                         }
                         processedMessageOldSize = processer.processedMessageSize();
                         countDoTheProcessing = 0;
                     }
                     
-                    if (countClearThePreprocessor == 200) {
+                    if (processer.processedMessageSize() == PROCESSED_MESSAGE_LIMIT_SIZE) {
                         processer.clear();
+                        System.out.println(processer.processedMessageSize());
+                        countDoTheProcessing = 0;
                     }
                 }
             } catch (IOException e) {
             }
+        }
+
+        private int messageSize() {
+            int N = 1;      // NEZ
+            int X = 1;      // numero du NEZ
+            int YYYY = 4;   // annee
+            int MM = 2;     // mois
+            int DD = 2;     // jour
+            int hh = 2;     // heure
+            int mm = 2;     // minute
+            int ss = 2;     // seconde
+            int TTT = 3;    // type du capteur
+            int dpdd = 4;   // mesure d.dd
+            
+            int size = N+X+YYYY+MM+DD+hh+mm+ss+TTT+dpdd;
+            
+            System.out.println(size);
+            return size;
         }
     }
 

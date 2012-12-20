@@ -1,7 +1,8 @@
 package data.preprocessing;
 
 import java.util.ArrayList;
-import java.util.HashSet;
+import java.util.LinkedHashSet;
+import java.util.Set;
 
 /**
  * This class processes an ArrayList of Strings into another one, according to 
@@ -27,7 +28,7 @@ public class Preprocesser {
     private ArrayList<Character> separators;
     
     /**
-     * Creates an instance of a Preprocesser.
+     * Initializes the class variables.
      * 
      * @param separator the default separator of the message.
      */
@@ -75,10 +76,9 @@ public class Preprocesser {
      * reinserting them again into the ArrayList may not be very efficient.
      */
     public void filterDuplicates() {
-        HashSet hashSet = new HashSet();
-        hashSet.addAll(processedMessage);
+        Set set = new LinkedHashSet(processedMessage);
         processedMessage.clear();
-        processedMessage.addAll(hashSet);
+        processedMessage.addAll(set);      
     }
     
     /**
