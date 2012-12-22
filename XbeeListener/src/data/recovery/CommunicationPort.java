@@ -1,11 +1,12 @@
-package xbeelistener;
+package data.recovery;
 
-import data.preprocessing.CSVParser;
-import data.preprocessing.Preprocesser;
+import data.processing.CSVParser;
+import data.processing.Preprocesser;
 import gnu.io.CommPort;
 import gnu.io.CommPortIdentifier;
 import gnu.io.SerialPort;
 import gnu.io.UnsupportedCommOperationException;
+import gui.GUI;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -85,7 +86,7 @@ public class CommunicationPort {
      * @throws UnsupportedCommOperationException if one tries to set invalid parameters to a port.
      * @throws IOException if one tries to get an IOStream of an invalid port.
      */
-    void connect(String portName) throws Exception {
+    public void connect(String portName) throws Exception {
         canStop = false;
 
         GUI.append("Getting port identifiers... ", GUI.INFO, GUI.LEFT_PANE);

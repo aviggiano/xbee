@@ -1,6 +1,7 @@
-package xbeelistener;
+package gui;
 
-import data.preprocessing.FileWriterReader;
+import data.processing.FileWriterReader;
+import data.recovery.CommunicationPort;
 import gnu.io.CommPortIdentifier;
 import java.awt.BorderLayout;
 import java.awt.Color;
@@ -46,7 +47,6 @@ import javax.swing.KeyStroke;
 import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
 import javax.swing.UnsupportedLookAndFeelException;
-import javax.swing.border.EtchedBorder;
 import javax.swing.text.SimpleAttributeSet;
 import javax.swing.text.StyleConstants;
 import javax.swing.text.StyledDocument;
@@ -63,7 +63,7 @@ public class GUI extends JFrame implements ActionListener, MouseListener{
     // Class variables
     
     CommunicationPort communicationPort;
-    protected static FileWriterReader rw;    
+    public static FileWriterReader rw;    
     
     private static DateFormat dateFormat;
     private static Date date;    

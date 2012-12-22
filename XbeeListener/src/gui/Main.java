@@ -1,4 +1,4 @@
-package xbeelistener;
+package gui;
 
 /**
  * This is the main class of the project. It creates an instance of the 
