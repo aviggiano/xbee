@@ -69,7 +69,7 @@ public class CommunicationPort {
     /**
      * Constructor that initializes the main variables.
      * 
-     * @param COMPortNumber the number of the COM Port where the connected to the Xbee.
+     * @param COMPortNumber the number of the COM Port where the Xbee is connected to.
      * @param rate the baud rate (usually 9600, but it depends on the transmission).
      */
     public CommunicationPort(String COMPortNumber, int rate) {
@@ -111,7 +111,7 @@ public class CommunicationPort {
                 in = serialPort.getInputStream();
                 out = serialPort.getOutputStream();
 
-                // stats the Threads for Writing and Reading a COM Port.
+                // starts the Threads for Writing and Reading a COM Port.
                 (new Thread(new SerialReader(in))).start();
                 (new Thread(new SerialWriter(out))).start();
 
