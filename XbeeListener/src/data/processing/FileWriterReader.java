@@ -64,7 +64,7 @@ public class FileWriterReader {
 
         File folder = new File(FOLDER);
         File file = new File(folder, FILENAME + EXTENSION);
-        message = new ArrayList<String>();
+        message = new ArrayList<>();
         try {
             FileReader fileReader = new FileReader(file);
             BufferedReader bufferedReader = new BufferedReader(fileReader);

@@ -47,7 +47,7 @@ import java.util.Date;
 public class CommunicationPort {
     // Class variables
     
-    private int rate;
+    private int baud;
     private static String COMPortNumber;
     static DateFormat dateFormat;
     static Date date;
@@ -70,10 +70,10 @@ public class CommunicationPort {
      * Constructor that initializes the main variables.
      * 
      * @param COMPortNumber the number of the COM Port where the Xbee is connected to.
-     * @param rate the baud rate (usually 9600, but it depends on the transmission).
+     * @param baud the baud rate (usually 9600, but it depends on the transmission).
      */
-    public CommunicationPort(String COMPortNumber, int rate) {
-        this.rate = rate;
+    public CommunicationPort(String COMPortNumber, int baud) {
+        this.baud = baud;
         this.COMPortNumber = COMPortNumber;
     }
 
@@ -106,7 +106,7 @@ public class CommunicationPort {
                 GUI.append("Starting serial reader and writer...\n", GUI.INFO, GUI.LEFT_PANE);
                 //si le port est present mais pas connecte
                 SerialPort serialPort = (SerialPort) commPort;
-                serialPort.setSerialPortParams(rate, SerialPort.DATABITS_8, SerialPort.STOPBITS_1, SerialPort.PARITY_NONE);
+                serialPort.setSerialPortParams(baud, SerialPort.DATABITS_8, SerialPort.STOPBITS_1, SerialPort.PARITY_NONE);
 
                 in = serialPort.getInputStream();
                 out = serialPort.getOutputStream();

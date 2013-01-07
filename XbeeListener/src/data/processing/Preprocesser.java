@@ -105,6 +105,8 @@ public class Preprocesser {
     /**
      * Adds a separator to the ArrayList, so each message will be separated by 
      * any one of the separators in the separators ArrayList.
+     * This is specially useful on Windows, because a line break is composed by
+     * a '\n' and a '\t'.
      * 
      * @param c the character that separates two messages.
      */
