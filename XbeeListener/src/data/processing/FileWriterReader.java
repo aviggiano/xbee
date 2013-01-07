@@ -28,7 +28,7 @@ public class FileWriterReader {
      * writing.
      */    
     
-    public static final String EXTENSION = ".txt";
+    public static final String EXTENSION = ".csv";
     public static String FILENAME = "message";
     public static final String FOLDER = System.getProperty("user.dir");
     

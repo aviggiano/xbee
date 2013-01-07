@@ -525,7 +525,7 @@ public class GUI extends JFrame implements ActionListener, MouseListener{
         
         if (savedForTheFirstTime) {
              rw = new FileWriterReader(filename);
-             rw.write(dateFormat.format(date) + " @ " + hostname + "\n");
+             //rw.write(dateFormat.format(date) + " @ " + hostname + "\n");
              
              savedForTheFirstTime = false;
         }
@@ -551,7 +551,7 @@ public class GUI extends JFrame implements ActionListener, MouseListener{
                     savedAsFileName = file.getName();
                     
                     rw  = new FileWriterReader(savedAsFileName);
-                    rw.write(dateFormat.format(date) + " @ " + hostname + "\n");
+                    //rw.write(dateFormat.format(date) + " @ " + hostname + "\n");
 
                     this.append("\nDonnees enregistrees avec succès dans le fichier ''" + savedAsFileName + rw.EXTENSION + "''.", INFO);
                 }
